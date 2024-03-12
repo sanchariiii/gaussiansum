@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaussian Sum Visualizer</title>
+<!-- hi this is my gaussian sum calculator/visualizor that i decided to make 
+because i didnt know what the gaussian sum was when we were taught in class, 
+hopefully this can help someone out -->
+<!-- im gonna do all my css and js on my html file to keep it clean i hope thats okay-->
+<style>
+
+ #startNumberInput{
+    padding:10px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 2px solid #7cbde9; 
+ } 
+
+ #endNumberInput{
+    padding:10px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 2px solid #7cbde9; 
+ } 
+
+    button {
+        padding:10px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 2px solid #7cbde9; 
+    background-color: aliceblue;
+
+    }
+    button:hover {
+        background-color: #a5d2ef; 
+
+    }
+
+.instructions{
+    font-family:'Courier New', Courier, monospace;
+    font-weight: 300;
+    font-style: oblique;
+
+}
+
+#result{
+    font-family:'Courier New', Courier, monospace;
+    font-weight: 300;
+    font-style: oblique;
+
+}
+
+@keyframes glowing {
+    0% {
+        text-shadow: 0 0 5px #f8f8f8;
+    }
+    25% {
+        text-shadow: 0 0 10px #6dc4ff;
+    }
+    50% {
+        text-shadow: 0 0 15px #3bb1ff;
+    }
+    75% {
+        text-shadow: 0 0 10px #6dc4ff;
+    }
+    100% {
+        text-shadow: 0 0 5px #f8f8f8;
+    }
+}
+
+span {
+    animation: glowing 3s infinite;
+}
+
+
+
+    #circleCanvas {
+        border: 1px solid rgb(112, 155, 178); 
+        background-color: #f8f8f8;
+        margin-top: 20px; 
+    }
+
+    .canvas-container {
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+        flex-direction: column; 
+        height: 100vh; 
+    }
+
+    form {
+        text-align: center; 
+    }
+</style>
+<script>
+function calculateGaussianSum() {
+    var startNumber = parseInt(document.getElementById('startNumberInput').value);
+    var endNumber = parseInt(document.getElementById('endNumberInput').value);
+
+    if (isNaN(startNumber) || isNaN(endNumber)) {
+        alert('oops! not a number!');
+        return;
+    }
+
+  
+    if (startNumber > endNumber) {
+        var temp = startNumber;
+        startNumber = endNumber;
+        endNumber = temp;
+    }
+
+    var sum = (endNumber * (endNumber + 1)) / 2 - (startNumber - 1) * startNumber / 2;
+    document.getElementById('result').textContent = 'Gaussian Sum: ' + sum;
+
+    animateCircles(sum);
+}
+
+function drawCircles(ctx, x, y, radius) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2, true); 
+    ctx.fillStyle = '#7cbde9';
+    ctx.fill();
+}
+
+function animateCircles(count) {
+    var canvas = document.getElementById('circleCanvas');
+    if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+        let radius = 20; 
+        let padding = 10; 
+        let diameter = radius * 2;
+
+        
+        let circles = [];
+        for (let i = 0; i < count; i++) {
+            circles.push({
+                x: Math.random() * (canvas.width - diameter) + radius,
+                y: Math.random() * (canvas.height - diameter) + radius,
+                speedX: (Math.random() - 0.5) * 4, 
+                speedY: (Math.random() - 0.5) * 4, 
+            });
+        }
+
+       
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < circles.length; i++) {
+                let circle = circles[i];
+
+                circle.x += circle.speedX;
+                circle.y += circle.speedY;
+
+                
+                if (circle.x + radius > canvas.width || circle.x - radius < 0) {
+                    circle.speedX = -circle.speedX;
+                }
+                if (circle.y + radius > canvas.height || circle.y - radius < 0) {
+                    circle.speedY = -circle.speedY;
+                }
+
+                drawCircles(ctx, circle.x, circle.y, radius);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
+}
+
+</script>
+</head>
+<body>
+
+    <h1 class="instructions">Welcome to the <span>Gaussian Sum Calculator</span> </h1>
+    <p class="instructions">Named after a famous mathematician named <span>Carl Friedrich Gauss</span>,<br> 
+        the Gaussian sum is a special way of adding consecutive numbers.<br> 
+        It's like a magic formula to quickly add up a bunch of consecutive numbers! <br> 
+        Start with two numbers: The first number and the last number in a sequence.<br> 
+        Add the first and last numbers together.
+        Multiply the result by the total number of pairs. <br> 
+        Each pair consists of one number from the beginning and one from the end.<br> 
+        Divide the result by 2. 
+        This is because each pair gives you two of the same sum, <br> 
+        and dividing by 2 makes sure you don't count them twice.</p>
+        <!-- i got all this text from chat gpt im sorryyy i just dont know maths -->
+
+        
+        <p class="instructions"> Here is a calculator i made for you.<br>
+        You can generate a <span>visualization</span> of the number of sums between two numbers of your choice.</p>
+        <p class="instructions"> its recommended to use smaller numbers(1-50) to not break the site.</p>
+    <p class="instructions">Please enter the<br> start and end numbers:</p>
+
+    <input type="text" id="startNumberInput" placeholder="starting number">
+    <br><br>
+    <input type="text" id="endNumberInput" placeholder="ending number">
+    <button onclick="calculateGaussianSum()">Calculate Gaussian Sum</button>
+
+    <span><p id="result"></p></span>
+    <div class="canvas-container">
+        <canvas id="circleCanvas" width="1000" height="700"></canvas>
+    </div>
+
+</body>
+</html>
